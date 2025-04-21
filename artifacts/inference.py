@@ -22,7 +22,9 @@ class Inference:
                        passing it to the model.
         """
         self.model = joblib.load(os.path.join(model_path, "sentiment_model.joblib"))
-        self.tokenizer = joblib.load(os.path.join(model_path, "sentiment_tokenizer.joblib"))
+        self.tokenizer = joblib.load(
+            os.path.join(model_path, "sentiment_tokenizer.joblib")
+        )
 
     def predict(self, text: str) -> str:
         """
@@ -52,12 +54,16 @@ class Inference:
         predicted_label = logits.argmax().item()
         return "positive" if predicted_label == 1 else "negative"
 
-    def _preprocess(self, text: str) -> transformers.tokenization_utils_base.BatchEncoding:
+    def _preprocess(
+        self, text: str
+    ) -> transformers.tokenization_utils_base.BatchEncoding:
         text = self._clean_text(text)
         tokens = self._tokenize(text)
         return tokens
 
-    def _tokenize(self, text: str) -> transformers.tokenization_utils_base.BatchEncoding:
+    def _tokenize(
+        self, text: str
+    ) -> transformers.tokenization_utils_base.BatchEncoding:
         return self.tokenizer(text, return_tensors="pt")
 
     @staticmethod
