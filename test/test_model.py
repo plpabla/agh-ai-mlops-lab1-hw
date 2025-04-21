@@ -20,3 +20,15 @@ def test_can_predict():
 
     assert inference is not None
     assert prediction in ["positive", "negative"]
+
+
+@pytest.mark.skip(reason="Fatal Python error: Segmentation fault")
+def test_can_load_with_cloudpickle():
+    import cloudpickle
+
+    with open("artifacts/inference_class.pkl", "rb") as file:
+        Inference = cloudpickle.load(file)
+    model_path = "artifacts"
+    inference = Inference(model_path=model_path)
+
+    assert inference is not None

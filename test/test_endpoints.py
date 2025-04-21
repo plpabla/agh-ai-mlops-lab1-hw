@@ -18,6 +18,13 @@ def test_predict_accepts_json():
     assert response.status_code == 200
 
 
+def test_predict_invalid_json_returns_422():
+    req = PredictRequest(text="test")
+    response = client.post("/predict", json=req.model_dump(exclude={"text"}))
+
+    assert response.status_code == 422
+
+
 def test_predict_negative_response():
     req = PredictRequest(text="I'm very disappointed with the service.")
     response = client.post("/predict", json=req.model_dump())
