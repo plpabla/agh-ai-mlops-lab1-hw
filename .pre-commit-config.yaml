@@ -1,3 +1,4 @@
+exclude: "^(artifacts)/"
 repos:
   # lint & format
   - repo: https://github.com/astral-sh/ruff-pre-commit
