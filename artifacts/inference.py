@@ -11,20 +11,17 @@ class Inference:
         Initializes the Inference for sentiment analysis by loading a pre-trained model and tokenizer.
 
         Args:
-            model_path (str): The file path (absolute or relative) to the directory containing the serialized
-                              sentiment analysis model and tokenizer. The model is
-                              expected to be stored as 'sentiment_model.joblib' and
-                              the tokenizer as 'sentiment_tokenizer.joblib'.
-
-        Attributes:
-            model: The loaded sentiment analysis model used for predictions.
-            tokenizer: The loaded tokenizer used to preprocess the input text before
-                       passing it to the model.
+            model_path (str): The file path to the directory containing the model and tokenizer.
         """
+        self.device = torch.device("cpu")
+
         self.model = joblib.load(os.path.join(model_path, "sentiment_model.joblib"))
         self.tokenizer = joblib.load(
             os.path.join(model_path, "sentiment_tokenizer.joblib")
         )
+
+        self.model.to(self.device)
+        self.model.eval()
 
     def predict(self, text: str) -> str:
         """
@@ -35,23 +32,25 @@ class Inference:
 
         Returns:
             str: The predicted sentiment label ('positive' or 'negative')
-                 based on the input text.
-
-        Steps:
-            1. Clean data
-            2. Preprocesses the input text using the tokenizer.
-            3. Passes the preprocessed text to the sentiment model for prediction.
-            4. Converts the model output (logits) into a human-readable sentiment label.
         """
-        with torch.no_grad():
-            inputs = self._preprocess(text)
-            logits = self.model(**inputs).logits
+        try:
+            with torch.no_grad():
+                inputs = self._preprocess(text)
+                # Move inputs to the same device as model
+                inputs = {k: v.to(self.device) for k, v in inputs.items()}
+                outputs = self.model(**inputs)
 
-        prediction = self._postprocess(logits)
-        return prediction
+                # Handle both older and newer model output formats
+                logits = outputs.logits if hasattr(outputs, "logits") else outputs[0]
+
+            prediction = self._postprocess(logits)
+            return prediction
+        except Exception as e:
+            print(f"Error during prediction: {str(e)}")
+            return f"error: {str(e)}"
 
     def _postprocess(self, logits: torch.Tensor) -> str:
-        predicted_label = logits.argmax().item()
+        predicted_label = logits.argmax(dim=-1).item()
         return "positive" if predicted_label == 1 else "negative"
 
     def _preprocess(
