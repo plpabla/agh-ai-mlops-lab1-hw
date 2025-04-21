@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from models.api import PredictRequest, PredictResponse
+from data_models.api import PredictRequest, PredictResponse
 
 app = FastAPI(version="0.0.1")
 
