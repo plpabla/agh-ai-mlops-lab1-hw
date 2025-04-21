@@ -45,7 +45,7 @@ class Inference:
         """
         with torch.no_grad():
             inputs = self._preprocess(text)
-            logits = model(**inputs).logits
+            logits = self.model(**inputs).logits
 
         prediction = self._postprocess(logits)
         return prediction

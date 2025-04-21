@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
 
 from app import app
-from models.api import PredictRequest, PredictResponse
+from data_models.api import PredictRequest, PredictResponse
 
 
 client = TestClient(app)
