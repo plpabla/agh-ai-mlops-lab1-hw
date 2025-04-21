@@ -18,9 +18,17 @@ def test_predict_accepts_json():
     assert response.status_code == 200
 
 
-def test_predict_response():
-    req = PredictRequest(text="test")
+def test_predict_negative_response():
+    req = PredictRequest(text="I'm very disappointed with the service.")
     response = client.post("/predict", json=req.model_dump())
 
     assert response.status_code == 200
-    assert response.json() == PredictResponse(prediction="neutral").model_dump()
+    assert response.json() == PredictResponse(prediction="negative").model_dump()
+
+
+def test_predict_positive_response():
+    req = PredictRequest(text="Very good service, I am happy with the product.")
+    response = client.post("/predict", json=req.model_dump())
+
+    assert response.status_code == 200
+    assert response.json() == PredictResponse(prediction="positive").model_dump()
